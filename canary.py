@@ -1,0 +1,12 @@
+import nemo.collections.asr as nemo_asr
+asr_model = nemo_asr.models.ASRModel.from_pretrained("nvidia/canary-1b")
+print("device: ", asr_model.device)
+asr_model = asr_model.to("cuda")
+transcriptions = asr_model.transcribe(["1.wav"])
+print("1: ", transcriptions)
+transcriptions = asr_model.transcribe(["2.wav"])
+print("2: ", transcriptions)
+transcriptions = asr_model.transcribe(["3.wav"])
+print("3: ", transcriptions)
+transcriptions = asr_model.transcribe(["4.wav"])
+print("4: ", transcriptions)
