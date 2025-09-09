@@ -8,7 +8,7 @@ class AudioSubscriber(Node):
     def __init__(self):
         super().__init__('audio_subscriber')
         self.subscription = self.create_subscription(AudioStamped, 'audio', self.callback, 10)
-        self.rate = 16000  # Sample rate
+        self.rate = 48000  # Sample rate
         self.channels = 1  # Stereo
         self.output_stream = sd.RawOutputStream(samplerate=self.rate, channels=self.channels, dtype = 'int16')
         self.output_stream.start()

@@ -16,3 +16,8 @@ segments on the ``/speech`` topic.
 | mic_channels | The microphone number of channels. | 6 |
 | mic_bitwidth | The microphone bitwidth. | 2 |
 | speech_topic | The topic to publish speech segments to. | "/speech" |
+
+sudo apt-get install libportaudio2
+sudo apt install portaudio19-dev
+apt install alsa-utils
+pip3 install numpy==1.24.0 -i https://pypi.tuna.tsinghua.edu.cn/simple

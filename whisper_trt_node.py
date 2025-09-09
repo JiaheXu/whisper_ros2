@@ -82,7 +82,7 @@ class WhisperTRTNode(Node):
         super().__init__('WhisperTRTNode')
 
         self.declare_parameter("model", "small.en")
-        self.declare_parameter("backend", "whisper_trt") 
+        self.declare_parameter("backend", "whisper") 
 
         # TODO: remove placeholder default
         self.declare_parameter("cache_dir", "data")#rclpy.Parameter.Type.STRING)
@@ -90,7 +90,7 @@ class WhisperTRTNode(Node):
 
         #self.declare_parameter("mic_device_index", rclpy.Parameter.Type.INTEGER)
         self.declare_parameter("mic_device_index", 0)
-        self.declare_parameter("mic_sample_rate", 16000)
+        self.declare_parameter("mic_sample_rate", 48000)
         self.declare_parameter("mic_channels", 6)
         self.declare_parameter("mic_bitwidth", 2)
         self.declare_parameter("mic_channel_for_asr", 0)
@@ -104,7 +104,7 @@ class WhisperTRTNode(Node):
         )
 
         self.logger = self.get_logger()
-        self.sample_rate = 16000
+        self.sample_rate = 48000
         self.max_filter_window = 20
         self.use_channel = 0
         self.speech_threshold = 0.2
@@ -121,7 +121,7 @@ class WhisperTRTNode(Node):
         ###############################################################
         # VAD model, tell if a chunk of audio is speech or not
         ###############################################################
-        self.vad_model = load_vad("/home/developer/javis_ws/whisper_ws/src/whisper_ros2/model/silero_vad.onnx")
+        self.vad_model = load_vad("/home/developer/model_data/silero_vad.onnx")
         print("finished vad model loading")
         # warmup run
         self.vad_model(np.zeros(1536, dtype=np.float32), sr=self.sample_rate)
@@ -131,11 +131,13 @@ class WhisperTRTNode(Node):
         ###############################################################
         # ASR model, convert speech to text
         ###############################################################
-        # self.asr_model = load_trt_model("tiny.en")
+
+        print("start asr_model loading")
         self.asr_model = load_model("base.en")
-        # warmup
-        self.asr_model.transcribe(np.zeros(1536, dtype=np.float32))
+        # self.asr_model = load_trt_model("tiny.en")
         print("finished asr_model loading")
+        self.asr_model.transcribe(np.zeros(1536, dtype=np.float32))
+        print("finished warming up")
 
         # Start a separate thread for processing messages
         self.vad_thread = threading.Thread(target=self.run_vad)
@@ -156,7 +158,7 @@ class WhisperTRTNode(Node):
 
         self.audio_sub = self.create_subscription(
             AudioStamped,
-            "/spot1/hand/sensor/audio/microphone",
+            "/audio",
             self.audio_callback,
             qos_profile
         )
@@ -173,7 +175,7 @@ class WhisperTRTNode(Node):
                 # print("audio_chunk: ", audio_chunk.audio_numpy_normalized[self.use_channel].shape )
                 # voice_prob = 0.0
                 voice_prob = float( self.vad_model(audio_chunk.audio_numpy_normalized[self.use_channel], sr=self.sample_rate).flatten()[0] )
-                # print("voice_prob: ", voice_prob)
+                print("voice_prob: ", voice_prob)
                 chunk = AudioChunk(
                     audio_raw=audio_chunk.audio_raw,
                     audio_numpy=audio_chunk.audio_numpy,

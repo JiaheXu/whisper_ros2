@@ -90,7 +90,7 @@ class WhisperTRTNode(Node):
 
         #self.declare_parameter("mic_device_index", rclpy.Parameter.Type.INTEGER)
         self.declare_parameter("mic_device_index", 0)
-        self.declare_parameter("mic_sample_rate", 16000)
+        self.declare_parameter("mic_sample_rate", 48000)
         self.declare_parameter("mic_channels", 6)
         self.declare_parameter("mic_bitwidth", 2)
         self.declare_parameter("mic_channel_for_asr", 0)
@@ -104,7 +104,7 @@ class WhisperTRTNode(Node):
         )
 
         self.logger = self.get_logger()
-        self.sample_rate = 16000
+        self.sample_rate = 48000
         self.max_filter_window = 8
         self.use_channel = 0
         self.speech_threshold = 0.7
@@ -121,7 +121,7 @@ class WhisperTRTNode(Node):
         ###############################################################
         # VAD model, tell if a chunk of audio is speech or not
         ###############################################################
-        self.vad_model = load_vad("/home/developer/javis_ws/whisper_ws/src/whisper_ros2/model/silero_vad.onnx")
+        self.vad_model = load_vad("/home/developer/model_data/silero_vad.onnx")
         print("finished vad model loading")
         # warmup run
         self.vad_model(np.zeros(1536, dtype=np.float32), sr=self.sample_rate)

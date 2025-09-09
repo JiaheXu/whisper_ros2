@@ -8,7 +8,7 @@ class AudioPublisher(Node):
     def __init__(self):
         super().__init__('audio_publisher')
         self.publisher_ = self.create_publisher(AudioStamped, 'audio', 10)
-        self.rate = 48000  # Sample rate
+        self.rate = 16000  # Sample rate
         self.channels = 1  # Mono
         self.chunk_size = 4096  # Buffer size
         self.audio_info = AudioInfo()
@@ -16,32 +16,16 @@ class AudioPublisher(Node):
         self.audio_info.channels = self.channels
         self.audio_info.rate = self.rate        
         self.audio_info.chunk = self.chunk_size
-
-        # Find USB PnP Sound Device index
-        self.device_index = self.find_device("USB PnP Sound Device")
-        self.get_logger().info(f"Using audio device index: {self.device_index}")
-
+        
         self.get_logger().info("Starting audio stream...")
-        with sd.RawInputStream(
-            samplerate=self.rate,
-            channels=self.channels,
-            dtype='int16',
-            device=self.device_index,
-            callback=self.callback
-        ):
+        with sd.RawInputStream(samplerate=self.rate, channels=self.channels, dtype = 'int16', callback=self.callback):
+        # with sd.RawInputStream(samplerate=self.rate, channels=self.channels, callback=self.callback):
             rclpy.spin(self)
-
-    def find_device(self, name_substring):
-        """Search for a device by substring and return its index"""
-        devices = sd.query_devices()
-        for idx, dev in enumerate(devices):
-            if name_substring.lower() in dev['name'].lower():
-                return idx
-        raise RuntimeError(f"Device with name containing '{name_substring}' not found")
 
     def callback(self, indata, frames, time, status):
         if status:
             print(f"Status: {status}")  # Print any errors or warnings
+        # self.output_stream.write(indata)
         array = np.frombuffer(indata, dtype=np.int16)
         audio_msg = AudioStamped()
         audio_msg.header.stamp = self.get_clock().now().to_msg()
