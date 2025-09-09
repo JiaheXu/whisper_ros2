@@ -7,7 +7,7 @@ from rosidl_runtime_py.utilities import get_message
 from rosbag2_py import SequentialReader, StorageOptions, ConverterOptions
 from scipy.io.wavfile import write as wav_write
 
-BAG_PATH = '/path/to/your/ros2_bag'  # Replace with your actual bag path
+BAG_PATH = '/home/jiahe/16khz'  # Replace with your actual bag path
 TOPIC_NAME = '/audio'
 OUTPUT_WAV = 'output.wav'
 
